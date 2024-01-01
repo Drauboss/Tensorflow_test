@@ -19,14 +19,11 @@ async function getData() {
     }))
     .filter((car) => car.mpg != null && car.horsepower != null);
 
-  console.log(cleaned);
-
   const Lper100km = cleaned.map((car) => ({
     Lper100km: 235.214 / car.mpg,
     horsepower: car.horsepower,
   }));
 
-  console.log(Lper100km);
   return Lper100km;
 }
 
