@@ -2,6 +2,7 @@
 const runButton = document.getElementById("run-button");
 const nrOfHiddenLayers = document.getElementById("hidden-layers");
 const nrOfEpochs = document.getElementById("epochs");
+const feature = document.getElementById("feature");
 
 /**
  * Get the car data reduced to just the variables we are interested
@@ -16,15 +17,22 @@ async function getData() {
     .map((car) => ({
       mpg: car.Miles_per_Gallon,
       horsepower: car.Horsepower,
+      Weight_in_lbs: car.Weight_in_lbs,
     }))
-    .filter((car) => car.mpg != null && car.horsepower != null);
+    .filter(
+      (car) =>
+        car.mpg != null && car.horsepower != null && car.Weight_in_lbs != null
+    );
 
-  const Lper100km = cleaned.map((car) => ({
+  const metric = cleaned.map((car) => ({
     Lper100km: 235.214 / car.mpg,
     horsepower: car.horsepower,
+    Weight_in_Kg: car.Weight_in_lbs * 0.45359237,
   }));
 
-  return Lper100km;
+  console.log(metric);
+
+  return metric;
 }
 
 function createModel() {
@@ -114,8 +122,7 @@ function convertToTensor(data) {
     tf.util.shuffle(data);
 
     // Step 2. Convert data to Tensor
-    const inputs = data.map((d) => d.horsepower);
-    console.log(inputs);
+    const inputs = data.map((d) => d[feature.value]);
     const labels = data.map((d) => d.Lper100km);
 
     const inputTensor = tf.tensor2d(inputs, [inputs.length, 1]);
@@ -192,7 +199,7 @@ function testModel(model, inputData, normalizationData) {
   });
 
   const originalPoints = inputData.map((d) => ({
-    x: d.horsepower,
+    x: d[feature.value],
     y: d.Lper100km,
   }));
 
@@ -203,7 +210,7 @@ function testModel(model, inputData, normalizationData) {
       series: ["original", "predicted"],
     },
     {
-      xLabel: "Horsepower in PS",
+      xLabel: `${feature.value}`,
       yLabel: "Consumption in L/100km",
       height: 300,
     }
@@ -213,18 +220,19 @@ function testModel(model, inputData, normalizationData) {
 async function run() {
   // Load and plot the original input data that we are going to train on.
   const data = await getData();
+  console.log(feature.value);
   const values = data.map((d) => ({
-    x: d.horsepower,
+    x: d[feature.value],
     y: d.Lper100km,
   }));
 
   tfvis.render.scatterplot(
-    { name: "Horsepower v L/100km" },
+    { name: `Datapoints` },
     { values },
     {
-      xLabel: "Horsepower in PS",
+      xLabel: `${feature.value}`,
       yLabel: "Consumption in L/100km",
-      height: 300,
+      height: 392,
     }
   );
 
@@ -244,6 +252,7 @@ async function run() {
   // Make some predictions using the model and compare them to the
   // original data
   testModel(model, data, tensorData);
+  // Clear the visor
 }
 
 // Set up an event listener on the button

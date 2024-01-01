@@ -2,30 +2,73 @@
 <html>
   <head>
     <title>TensorFlow.js Tutorial</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 300px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-top: 20px;
+        text-align: center;
+      }
+      .container span {
+        font-size: 20px;
+        margin-bottom: 10px;
+        display: block;
+      }
+      #run-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        display: block;
+        align-content: center;
+      }
+      #run-button:hover {
+        background-color: #0056b3;
+      }
+    </style>
 
     <!-- Import TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
     <!-- Import tfjs-vis -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
   </head>
-  <body style="display: flex; flex-direction: column">
-    <div style="width: 300px">
-      <span style="margin: auto; font-size: 32px"
-        >Choose Number of Hidden Layers:</span
+  <body>
+    <div class="container">
+      <span
+        >Choose the Feature of the Car Data which is used to predict the
+        consumption:</span
       >
+      <select id="feature">
+        <option value="horsepower">Horsepower in PS</option>
+        <option value="Weight_in_Kg" selected>Weight in Kg</option>
+      </select>
+
+      <span>Choose Number of Hidden Layers:</span>
       <select id="hidden-layers">
         <option value="1">1</option>
         <option value="2" selected>2</option>
         <option value="3">3</option>
       </select>
 
-      <span style="margin: auto; font-size: 32px"
-        >Choose Number of Epochs:</span
-      >
+      <span>Choose Number of Epochs:</span>
       <input id="epochs" type="number" value="50" />
 
       <!-- Add buttons to the page -->
-      <button style="margin: 10px" id="run-button">Run</button>
+      <button id="run-button">Run</button>
     </div>
 
     <!-- Import the main script file -->
