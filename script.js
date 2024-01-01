@@ -1,3 +1,8 @@
+// Get a reference to the button and the div
+const runButton = document.getElementById("run-button");
+const nrOfHiddenLayers = document.getElementById("hidden-layers");
+const nrOfEpochs = document.getElementById("epochs");
+
 /**
  * Get the car data reduced to just the variables we are interested
  * and cleaned of missing data.
@@ -14,13 +19,15 @@ async function getData() {
     }))
     .filter((car) => car.mpg != null && car.horsepower != null);
 
-  const KmPL = cleaned.map((car) => ({
-    mpg: car.mpg,
+  console.log(cleaned);
+
+  const Lper100km = cleaned.map((car) => ({
+    Lper100km: 235.214 / car.mpg,
     horsepower: car.horsepower,
-    kmPL: car.mpg * 1.60934,
   }));
 
-  return cleaned;
+  console.log(Lper100km);
+  return Lper100km;
 }
 
 function createModel() {
@@ -28,14 +35,69 @@ function createModel() {
   const model = tf.sequential();
 
   // Add a single input layer
-  model.add(tf.layers.dense({ inputShape: [1], units: 1, useBias: true }));
+  model.add(
+    tf.layers.dense({
+      inputShape: [1],
+      units: 1,
+      useBias: true,
+      name: "Input_Layer",
+    })
+  );
 
   // Add hidden layers
-  model.add(tf.layers.dense({ units: 50, activation: "relu" }));
-  model.add(tf.layers.dense({ units: 50, activation: "relu" }));
+  switch (nrOfHiddenLayers.value) {
+    case "1":
+      model.add(
+        tf.layers.dense({
+          units: 50,
+          activation: "relu",
+          name: "Hidden_Layer_1",
+        })
+      );
+      break;
+    case "2":
+      model.add(
+        tf.layers.dense({
+          units: 50,
+          activation: "relu",
+          name: "Hidden_Layer_1",
+        })
+      );
+      model.add(
+        tf.layers.dense({
+          units: 50,
+          activation: "relu",
+          name: "Hidden_Layer_2",
+        })
+      );
+      break;
+    case "3":
+      model.add(
+        tf.layers.dense({
+          units: 50,
+          activation: "relu",
+          name: "Hidden_Layer_1",
+        })
+      );
+      model.add(
+        tf.layers.dense({
+          units: 50,
+          activation: "relu",
+          name: "Hidden_Layer_2",
+        })
+      );
+      model.add(
+        tf.layers.dense({
+          units: 50,
+          activation: "relu",
+          name: "Hidden_Layer_3",
+        })
+      );
+      break;
+  }
 
   // Add an output layer
-  model.add(tf.layers.dense({ units: 1, useBias: true }));
+  model.add(tf.layers.dense({ units: 1, useBias: true, name: "Output_Layer" }));
 
   return model;
 }
@@ -57,7 +119,7 @@ function convertToTensor(data) {
     // Step 2. Convert data to Tensor
     const inputs = data.map((d) => d.horsepower);
     console.log(inputs);
-    const labels = data.map((d) => d.mpg);
+    const labels = data.map((d) => d.Lper100km);
 
     const inputTensor = tf.tensor2d(inputs, [inputs.length, 1]);
     const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
@@ -96,7 +158,7 @@ async function trainModel(model, inputs, labels) {
   });
 
   const batchSize = 32;
-  const epochs = 100;
+  const epochs = nrOfEpochs.value;
 
   return await model.fit(inputs, labels, {
     batchSize,
@@ -134,7 +196,7 @@ function testModel(model, inputData, normalizationData) {
 
   const originalPoints = inputData.map((d) => ({
     x: d.horsepower,
-    y: d.mpg,
+    y: d.Lper100km,
   }));
 
   tfvis.render.scatterplot(
@@ -144,8 +206,8 @@ function testModel(model, inputData, normalizationData) {
       series: ["original", "predicted"],
     },
     {
-      xLabel: "Horsepower",
-      yLabel: "MPG",
+      xLabel: "Horsepower in PS",
+      yLabel: "Consumption in L/100km",
       height: 300,
     }
   );
@@ -156,15 +218,15 @@ async function run() {
   const data = await getData();
   const values = data.map((d) => ({
     x: d.horsepower,
-    y: d.mpg,
+    y: d.Lper100km,
   }));
 
   tfvis.render.scatterplot(
-    { name: "Horsepower v MPG" },
+    { name: "Horsepower v L/100km" },
     { values },
     {
-      xLabel: "Horsepower",
-      yLabel: "MPG",
+      xLabel: "Horsepower in PS",
+      yLabel: "Consumption in L/100km",
       height: 300,
     }
   );
@@ -187,4 +249,5 @@ async function run() {
   testModel(model, data, tensorData);
 }
 
-document.addEventListener("DOMContentLoaded", run);
+// Set up an event listener on the button
+runButton.addEventListener("click", run);

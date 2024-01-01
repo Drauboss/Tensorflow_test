@@ -8,7 +8,26 @@
     <!-- Import tfjs-vis -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
   </head>
-  <body>
+  <body style="display: flex; flex-direction: column">
+    <div style="width: 300px">
+      <span style="margin: auto; font-size: 32px"
+        >Choose Number of Hidden Layers:</span
+      >
+      <select id="hidden-layers">
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+      </select>
+
+      <span style="margin: auto; font-size: 32px"
+        >Choose Number of Epochs:</span
+      >
+      <input id="epochs" type="number" value="50" />
+
+      <!-- Add buttons to the page -->
+      <button style="margin: 10px" id="run-button">Run</button>
+    </div>
+
     <!-- Import the main script file -->
     <script src="script.js"></script>
   </body>
